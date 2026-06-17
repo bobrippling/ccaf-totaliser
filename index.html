@@ -124,10 +124,7 @@
         <img src="totaliser.webp" alt="Blue Peter totaliser">
     </div>
 
-    <!-- YouTube player — 1×1, off-screen; audio plays via IFrame API -->
-    <div style="position:absolute;width:1px;height:1px;overflow:hidden;left:-9999px" aria-hidden="true">
-        <div id="yt-player"></div>
-    </div>
+    <audio id="tune" src="bluepeter.mp3" preload="auto"></audio>
 
     <script>
         // --- TO UPDATE THE AMOUNTS, CHANGE THESE VALUES ---
@@ -151,21 +148,7 @@
         const revealButton = document.getElementById('reveal-button');
         const mainContent = document.getElementById('main-content');
 
-        // YouTube IFrame API — loaded async, player ready callback sets ytPlayer
-        let ytPlayer = null;
-        let ytReady = false;
-        window.onYouTubeIframeAPIReady = function () {
-            ytPlayer = new YT.Player('yt-player', {
-                videoId: 'fJkpu5dABrs',
-                playerVars: { autoplay: 0, controls: 0, disablekb: 1 },
-                events: { onReady: () => { ytReady = true; } }
-            });
-        };
-        (function () {
-            const tag = document.createElement('script');
-            tag.src = 'https://www.youtube.com/iframe_api';
-            document.head.appendChild(tag);
-        })();
+        const tune = document.getElementById('tune');
 
         function buildChartData() {
             const sorted = [...passDates].sort();
@@ -255,9 +238,8 @@
         }
 
         function playSound() {
-            if (ytReady && ytPlayer) {
-                ytPlayer.playVideo();
-            }
+            tune.currentTime = 0;
+            tune.play().catch(() => {});
         }
 
         function animateCount(element, target, duration = 1000) {
