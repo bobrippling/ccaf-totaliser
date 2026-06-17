@@ -14,37 +14,55 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #111827;
+            background-color: #1a0535;
+            background-image:
+                radial-gradient(ellipse at 20% 50%, rgba(220, 38, 127, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 50%, rgba(37, 99, 235, 0.15) 0%, transparent 60%);
         }
         .font-display {
             font-family: 'Russo One', sans-serif;
         }
         .number-flicker {
             transition: all 0.3s ease-in-out;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 10px rgba(168, 85, 247, 0.5);
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.6), 0 0 20px currentColor;
         }
-        .card {
-            @apply bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl shadow-2xl p-4 sm:p-6 text-center transition-all duration-300 flex flex-col justify-center;
+        /* Rainbow ring border — mimics the stacked coloured rings */
+        .rainbow-border {
+            background: linear-gradient(180deg,
+                #ef4444 0%,
+                #f97316 16%,
+                #eab308 33%,
+                #22c55e 50%,
+                #06b6d4 66%,
+                #3b82f6 83%,
+                #8b5cf6 100%
+            );
+            padding: 3px;
+            border-radius: 1.5rem;
         }
-        #reveal-overlay {
-            transition: opacity 0.5s ease-in-out;
-        }
-        #main-content {
-            transition: opacity 0.5s ease-in-out;
-        }
+        .card-green  { background: rgba(34,197,94,0.12);  border: 2px solid #22c55e; box-shadow: 0 0 24px rgba(34,197,94,0.25); }
+        .card-amber  { background: rgba(234,179,8,0.12);  border: 2px solid #eab308; box-shadow: 0 0 24px rgba(234,179,8,0.25); }
+        .card-blue   { background: rgba(59,130,246,0.12); border: 2px solid #3b82f6; box-shadow: 0 0 24px rgba(59,130,246,0.25); }
+        .card-base   { border-radius: 1rem; padding: 1rem 1.5rem; text-align: center; transition: all 0.3s; display: flex; flex-direction: column; justify-content: center; }
+        #reveal-overlay { transition: opacity 0.5s ease-in-out; }
+        #main-content   { transition: opacity 0.5s ease-in-out; }
     </style>
 </head>
-<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen p-4">
+<body class="text-white flex items-center justify-center min-h-screen p-4">
 
     <!-- Click to Reveal Overlay -->
-    <div id="reveal-overlay" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm flex flex-col items-center justify-center z-50 text-center p-4">
+    <div id="reveal-overlay" class="fixed inset-0 backdrop-blur-sm flex flex-col items-center justify-center z-50 text-center p-4"
+         style="background: rgba(26,5,53,0.85)">
         <div class="flex items-center justify-center gap-4 mb-4">
             <span class="text-6xl">🎓</span>
             <img src="claude.png" width="64" height="64" alt="Claude logo">
         </div>
-        <h1 class="font-display text-3xl sm:text-5xl font-bold tracking-wider text-purple-300">Claude Certified Architect</h1>
-        <p class="font-display text-xl sm:text-2xl text-purple-400 mt-1">Foundations</p>
-        <button id="reveal-button" class="mt-8 font-display text-2xl bg-purple-600 hover:bg-purple-500 text-white font-bold py-4 px-8 rounded-full shadow-lg shadow-purple-500/30 transform transition-transform duration-200 hover:scale-105">
+        <h1 class="font-display text-3xl sm:text-5xl font-bold tracking-wider"
+            style="color:#fde047; text-shadow: 0 0 20px rgba(253,224,71,0.5)">Claude Certified Architect</h1>
+        <p class="font-display text-xl sm:text-2xl mt-1" style="color:#fb923c">Foundations</p>
+        <button id="reveal-button"
+                class="mt-8 font-display text-2xl text-white font-bold py-4 px-8 rounded-full transform transition-transform duration-200 hover:scale-105"
+                style="background: linear-gradient(135deg, #ef4444, #f97316, #eab308); box-shadow: 0 8px 32px rgba(249,115,22,0.4)">
             CLICK TO REVEAL EXAM PASSES
         </button>
     </div>
@@ -56,44 +74,53 @@
                 <span class="text-5xl">🎓</span>
                 <img src="claude.png" width="52" height="52" alt="Claude logo">
             </div>
-            <h1 class="font-display text-3xl sm:text-4xl font-bold tracking-wider text-purple-300">Claude Certified Architect</h1>
-            <p class="font-display text-xl text-purple-400">Foundations</p>
+            <h1 class="font-display text-3xl sm:text-4xl font-bold tracking-wider"
+                style="color:#fde047; text-shadow: 0 0 20px rgba(253,224,71,0.4)">Claude Certified Architect</h1>
+            <p class="font-display text-xl" style="color:#fb923c">Foundations</p>
         </header>
+
+        <!-- Rainbow divider strip -->
+        <div class="rounded-full h-2 w-full" style="background: linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e, #06b6d4, #3b82f6, #8b5cf6)"></div>
 
         <!-- Stats Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <!-- Passed -->
-            <div class="card">
-                <h3 class="font-display text-xl sm:text-2xl text-green-300 mb-2">PASSED</h3>
-                <div id="passedCount" class="text-5xl sm:text-6xl font-bold text-white number-flicker">0</div>
+            <div class="card-base card-green">
+                <h3 class="font-display text-xl sm:text-2xl mb-2" style="color:#4ade80">PASSED</h3>
+                <div id="passedCount" class="text-5xl sm:text-6xl font-bold text-white number-flicker" style="color:#4ade80">0</div>
             </div>
 
             <!-- Awaiting Results -->
-            <div class="card">
-                <h3 class="font-display text-base sm:text-xl text-amber-300 mb-2 whitespace-nowrap">AWAITING RESULTS</h3>
-                <div id="pendingCount" class="text-5xl sm:text-6xl font-bold text-white number-flicker">0</div>
+            <div class="card-base card-amber">
+                <h3 class="font-display text-base sm:text-xl mb-2 whitespace-nowrap" style="color:#facc15">AWAITING RESULTS</h3>
+                <div id="pendingCount" class="text-5xl sm:text-6xl font-bold number-flicker" style="color:#facc15">0</div>
             </div>
 
             <!-- Attempted -->
-            <div class="card">
-                <h3 class="font-display text-xl sm:text-2xl text-cyan-300 mb-2">ATTEMPTED</h3>
-                <div id="attemptedCount" class="text-5xl sm:text-6xl font-bold text-white number-flicker">0</div>
+            <div class="card-base card-blue">
+                <h3 class="font-display text-xl sm:text-2xl mb-2" style="color:#60a5fa">ATTEMPTED</h3>
+                <div id="attemptedCount" class="text-5xl sm:text-6xl font-bold number-flicker" style="color:#60a5fa">0</div>
             </div>
         </div>
 
-        <!-- Pass Rate (Bottom) -->
-        <div class="bg-gradient-to-br from-purple-500 to-indigo-600 p-1 rounded-3xl shadow-2xl shadow-purple-500/20">
-            <div class="bg-gray-900 rounded-2xl p-6 sm:p-8 text-center">
-                <h2 class="font-display text-2xl sm:text-3xl font-bold tracking-widest text-gray-300 uppercase">Pass Rate</h2>
-                <div id="passRate" class="font-display text-6xl sm:text-8xl md:text-9xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-purple-300 to-white number-flicker py-4">0%</div>
+        <!-- Pass Rate -->
+        <div class="rainbow-border shadow-2xl">
+            <div class="rounded-2xl p-6 sm:p-8 text-center" style="background:#12022a">
+                <h2 class="font-display text-2xl sm:text-3xl font-bold tracking-widest uppercase" style="color:#e2e8f0">Pass Rate</h2>
+                <div id="passRate"
+                     class="font-display text-6xl sm:text-8xl md:text-9xl font-extrabold number-flicker py-4"
+                     style="background: linear-gradient(135deg, #fde047, #fb923c, #f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text">0%</div>
             </div>
         </div>
 
         <!-- Passes Over Time Chart -->
-        <div class="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl shadow-2xl p-4 sm:p-6">
-            <h2 class="font-display text-xl sm:text-2xl font-bold tracking-widest text-gray-300 uppercase text-center mb-4">Passes Over Time</h2>
+        <div class="rounded-2xl shadow-2xl p-4 sm:p-6" style="background: rgba(255,255,255,0.04); border: 2px solid rgba(255,255,255,0.1)">
+            <h2 class="font-display text-xl sm:text-2xl font-bold tracking-widest uppercase text-center mb-4" style="color:#e2e8f0">Passes Over Time</h2>
             <canvas id="passChart"></canvas>
         </div>
+
+        <!-- Rainbow divider strip (bottom) -->
+        <div class="rounded-full h-2 w-full" style="background: linear-gradient(90deg, #8b5cf6, #3b82f6, #06b6d4, #22c55e, #eab308, #f97316, #ef4444)"></div>
     </div>
 
     <script>
@@ -138,23 +165,24 @@
             const points = buildChartData();
             const ctx = document.getElementById('passChart').getContext('2d');
 
-            const gradient = ctx.createLinearGradient(0, 0, 0, 200);
-            gradient.addColorStop(0, 'rgba(168, 85, 247, 0.4)');
-            gradient.addColorStop(1, 'rgba(168, 85, 247, 0)');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 220);
+            gradient.addColorStop(0, 'rgba(234, 179, 8, 0.35)');
+            gradient.addColorStop(0.5, 'rgba(249, 115, 22, 0.2)');
+            gradient.addColorStop(1, 'rgba(239, 68, 68, 0)');
 
             new Chart(ctx, {
                 type: 'line',
                 data: {
                     datasets: [{
                         data: points,
-                        borderColor: '#a855f7',
+                        borderColor: '#f97316',
                         backgroundColor: gradient,
                         borderWidth: 3,
-                        pointBackgroundColor: '#a855f7',
+                        pointBackgroundColor: '#eab308',
                         pointBorderColor: '#fff',
                         pointBorderWidth: 2,
                         pointRadius: 6,
-                        pointHoverRadius: 8,
+                        pointHoverRadius: 9,
                         fill: true,
                         stepped: true,
                         tension: 0,
@@ -165,10 +193,10 @@
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: '#1f2937',
-                            borderColor: '#6b21a8',
+                            backgroundColor: '#12022a',
+                            borderColor: '#f97316',
                             borderWidth: 1,
-                            titleColor: '#d8b4fe',
+                            titleColor: '#fde047',
                             bodyColor: '#fff',
                             callbacks: {
                                 title: items => items[0].label,
@@ -181,12 +209,12 @@
                             type: 'time',
                             time: { unit: 'day', tooltipFormat: 'yyyy-MM-dd', displayFormats: { day: 'MMM d' } },
                             grid: { color: 'rgba(255,255,255,0.05)' },
-                            ticks: { color: '#9ca3af', font: { family: 'Poppins' } },
+                            ticks: { color: '#94a3b8', font: { family: 'Poppins' } },
                         },
                         y: {
                             beginAtZero: true,
                             ticks: {
-                                color: '#9ca3af',
+                                color: '#94a3b8',
                                 font: { family: 'Poppins' },
                                 stepSize: 1,
                                 precision: 0,
