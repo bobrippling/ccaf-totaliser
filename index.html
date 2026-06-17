@@ -104,7 +104,7 @@
             animateCount(passedEl, passedTotal);
             animateCount(pendingEl, pendingTotal);
             animateCount(attemptedEl, attemptedTotal);
-            animateRate(passRateEl, attemptedTotal > 0 ? (passedTotal / attemptedTotal) * 100 : 0);
+            animateRate(passRateEl, attemptedTotal > 0 ? (passedTotal / (attemptedTotal - pendingTotal)) * 100 : 0);
         }
 
         function playSound() {
