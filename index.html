@@ -8,7 +8,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Russo+One&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/tone@15.0.4/build/Tone.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <style>
@@ -125,6 +124,11 @@
         <img src="totaliser.webp" alt="Blue Peter totaliser">
     </div>
 
+    <!-- YouTube player — 1×1, off-screen; audio plays via IFrame API -->
+    <div style="position:absolute;width:1px;height:1px;overflow:hidden;left:-9999px" aria-hidden="true">
+        <div id="yt-player"></div>
+    </div>
+
     <script>
         // --- TO UPDATE THE AMOUNTS, CHANGE THESE VALUES ---
         const passDates = [
@@ -147,7 +151,21 @@
         const revealButton = document.getElementById('reveal-button');
         const mainContent = document.getElementById('main-content');
 
-        let totalUpdateSynth;
+        // YouTube IFrame API — loaded async, player ready callback sets ytPlayer
+        let ytPlayer = null;
+        let ytReady = false;
+        window.onYouTubeIframeAPIReady = function () {
+            ytPlayer = new YT.Player('yt-player', {
+                videoId: 'fJkpu5dABrs',
+                playerVars: { autoplay: 0, controls: 0, disablekb: 1 },
+                events: { onReady: () => { ytReady = true; } }
+            });
+        };
+        (function () {
+            const tag = document.createElement('script');
+            tag.src = 'https://www.youtube.com/iframe_api';
+            document.head.appendChild(tag);
+        })();
 
         function buildChartData() {
             const sorted = [...passDates].sort();
@@ -237,13 +255,8 @@
         }
 
         function playSound() {
-            if (totalUpdateSynth) {
-                Tone.start().then(() => {
-                    totalUpdateSynth.triggerAttackRelease("G4", "4n", Tone.now() + 0.1);
-                    totalUpdateSynth.triggerAttackRelease("C5", "4n", Tone.now() + 0.3);
-                }).catch(e => {
-                    console.warn("Audio could not be started automatically: ", e);
-                });
+            if (ytReady && ytPlayer) {
+                ytPlayer.playVideo();
             }
         }
 
@@ -274,21 +287,6 @@
                 else element.textContent = `${target.toFixed(1)}%`;
             };
             window.requestAnimationFrame(step);
-        }
-
-        try {
-            totalUpdateSynth = new Tone.FMSynth({
-                harmonicity: 3,
-                modulationIndex: 10,
-                detune: 0,
-                oscillator: { type: "sine" },
-                envelope: { attack: 0.01, decay: 0.2, sustain: 0.5, release: 0.8 },
-                modulation: { type: "square" },
-                modulationEnvelope: { attack: 0.1, decay: 0, sustain: 1, release: 0.5 }
-            }).toDestination();
-        } catch (e) {
-            console.error("Could not initialize Tone.js audio engine.", e);
-            totalUpdateSynth = null;
         }
 
         revealButton.addEventListener('click', () => {
