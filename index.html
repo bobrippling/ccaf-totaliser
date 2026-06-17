@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Russo+One&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tone@15.0.4/build/Tone.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -86,15 +87,27 @@
                 <div id="passRate" class="font-display text-6xl sm:text-8xl md:text-9xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-purple-300 to-white number-flicker py-4">0%</div>
             </div>
         </div>
+
+        <!-- Passes Over Time Chart -->
+        <div class="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-2xl shadow-2xl p-4 sm:p-6">
+            <h2 class="font-display text-xl sm:text-2xl font-bold tracking-widest text-gray-300 uppercase text-center mb-4">Passes Over Time</h2>
+            <canvas id="passChart"></canvas>
+        </div>
     </div>
 
     <script>
         // --- TO UPDATE THE AMOUNTS, CHANGE THESE VALUES ---
-        const passedTotal = 3;    // Number of people who passed
+        const passDates = [
+            "2026-06-06", // r
+            "2026-06-16", // j
+            "2026-06-17", // a
+        ];
         const pendingTotal = 3;   // Number of people awaiting results
         const failedTotal = 0;
-        const attemptedTotal = passedTotal + failedTotal + pendingTotal; // Total number of people who attempted
         // ---------------------------------------------------
+
+        const passedTotal = passDates.length;
+        const attemptedTotal = passedTotal + failedTotal + pendingTotal;
 
         const passedEl = document.getElementById('passedCount');
         const pendingEl = document.getElementById('pendingCount');
@@ -106,11 +119,90 @@
 
         let totalUpdateSynth;
 
+        function buildChartData() {
+            const sorted = [...passDates].sort();
+            const counts = {};
+            for (const d of sorted) {
+                counts[d] = (counts[d] || 0) + 1;
+            }
+            const labels = Object.keys(counts);
+            let cumulative = 0;
+            const data = labels.map(d => {
+                cumulative += counts[d];
+                return cumulative;
+            });
+            return { labels, data };
+        }
+
+        function initChart() {
+            const { labels, data } = buildChartData();
+            const ctx = document.getElementById('passChart').getContext('2d');
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+            gradient.addColorStop(0, 'rgba(168, 85, 247, 0.4)');
+            gradient.addColorStop(1, 'rgba(168, 85, 247, 0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        data,
+                        borderColor: '#a855f7',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#a855f7',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        fill: true,
+                        stepped: true,
+                        tension: 0,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1f2937',
+                            borderColor: '#6b21a8',
+                            borderWidth: 1,
+                            titleColor: '#d8b4fe',
+                            bodyColor: '#fff',
+                            callbacks: {
+                                title: items => items[0].label,
+                                label: item => ` ${item.raw} passed`,
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#9ca3af', font: { family: 'Poppins' } },
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#9ca3af',
+                                font: { family: 'Poppins' },
+                                stepSize: 1,
+                                precision: 0,
+                            },
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                        }
+                    }
+                }
+            });
+        }
+
         function updateDisplay() {
             animateCount(passedEl, passedTotal);
             animateCount(pendingEl, pendingTotal);
             animateCount(attemptedEl, attemptedTotal);
             animateRate(passRateEl, attemptedTotal > 0 ? (passedTotal / (attemptedTotal - pendingTotal)) * 100 : 0);
+            initChart();
         }
 
         function playSound() {
