@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Russo+One&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tone@15.0.4/build/Tone.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -125,17 +126,16 @@
             for (const d of sorted) {
                 counts[d] = (counts[d] || 0) + 1;
             }
-            const labels = Object.keys(counts);
             let cumulative = 0;
-            const data = labels.map(d => {
+            const points = Object.keys(counts).map(d => {
                 cumulative += counts[d];
-                return cumulative;
+                return { x: d, y: cumulative };
             });
-            return { labels, data };
+            return points;
         }
 
         function initChart() {
-            const { labels, data } = buildChartData();
+            const points = buildChartData();
             const ctx = document.getElementById('passChart').getContext('2d');
 
             const gradient = ctx.createLinearGradient(0, 0, 0, 200);
@@ -145,9 +145,8 @@
             new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels,
                     datasets: [{
-                        data,
+                        data: points,
                         borderColor: '#a855f7',
                         backgroundColor: gradient,
                         borderWidth: 3,
@@ -173,12 +172,14 @@
                             bodyColor: '#fff',
                             callbacks: {
                                 title: items => items[0].label,
-                                label: item => ` ${item.raw} passed`,
+                                label: item => ` ${item.raw.y} passed`,
                             }
                         }
                     },
                     scales: {
                         x: {
+                            type: 'time',
+                            time: { unit: 'day', tooltipFormat: 'yyyy-MM-dd', displayFormats: { day: 'MMM d' } },
                             grid: { color: 'rgba(255,255,255,0.05)' },
                             ticks: { color: '#9ca3af', font: { family: 'Poppins' } },
                         },
