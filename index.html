@@ -126,6 +126,12 @@
 
     <audio id="tune" src="bluepeter.mp3" preload="auto"></audio>
 
+    <button id="tune-toggle"
+            class="fixed bottom-4 right-4 font-display text-sm text-white font-bold py-2 px-4 rounded-full transition-all duration-200 hover:scale-105 opacity-0 pointer-events-none"
+            style="background: rgba(26,5,53,0.85); border: 2px solid #f97316; box-shadow: 0 4px 16px rgba(249,115,22,0.3)">
+        🔊 ⏹
+    </button>
+
     <script>
         // --- TO UPDATE THE AMOUNTS, CHANGE THESE VALUES ---
         const passDates = [
@@ -149,6 +155,22 @@
         const mainContent = document.getElementById('main-content');
 
         const tune = document.getElementById('tune');
+        const tuneToggle = document.getElementById('tune-toggle');
+
+        tuneToggle.addEventListener('click', () => {
+            if (tune.paused) {
+                tune.play().catch(() => {});
+                tuneToggle.textContent = '🔊 ⏹';
+            } else {
+                tune.pause();
+                tune.currentTime = 0;
+                tuneToggle.textContent = '🔊 ▶';
+            }
+        });
+
+        tune.addEventListener('ended', () => {
+            tuneToggle.textContent = '🔊 ▶';
+        });
 
         function buildChartData() {
             const sorted = [...passDates].sort();
@@ -277,6 +299,8 @@
             revealOverlay.style.opacity = '0';
             revealOverlay.style.pointerEvents = 'none';
             mainContent.style.opacity = '1';
+            tuneToggle.style.opacity = '1';
+            tuneToggle.style.pointerEvents = 'auto';
         }, { once: true });
     </script>
 </body>
