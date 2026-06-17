@@ -53,11 +53,17 @@
         </header>
 
         <!-- Stats Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <!-- Passed -->
             <div class="card">
                 <h3 class="font-display text-xl sm:text-2xl text-green-300 mb-2">PASSED</h3>
                 <div id="passedCount" class="text-5xl sm:text-6xl font-bold text-white number-flicker">0</div>
+            </div>
+
+            <!-- Awaiting Results -->
+            <div class="card">
+                <h3 class="font-display text-xl sm:text-2xl text-amber-300 mb-2">AWAITING RESULTS</h3>
+                <div id="pendingCount" class="text-5xl sm:text-6xl font-bold text-white number-flicker">0</div>
             </div>
 
             <!-- Attempted -->
@@ -79,10 +85,12 @@
     <script>
         // --- TO UPDATE THE AMOUNTS, CHANGE THESE VALUES ---
         const passedTotal = 0;    // Number of people who passed
+        const pendingTotal = 0;   // Number of people awaiting results
         const attemptedTotal = 0; // Total number of people who attempted
         // ---------------------------------------------------
 
         const passedEl = document.getElementById('passedCount');
+        const pendingEl = document.getElementById('pendingCount');
         const attemptedEl = document.getElementById('attemptedCount');
         const passRateEl = document.getElementById('passRate');
         const revealOverlay = document.getElementById('reveal-overlay');
@@ -93,6 +101,7 @@
 
         function updateDisplay() {
             animateCount(passedEl, passedTotal);
+            animateCount(pendingEl, pendingTotal);
             animateCount(attemptedEl, attemptedTotal);
             animateRate(passRateEl, attemptedTotal > 0 ? (passedTotal / attemptedTotal) * 100 : 0);
         }
