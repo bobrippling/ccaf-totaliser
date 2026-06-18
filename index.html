@@ -110,16 +110,6 @@
             </div>
         </div>
 
-        <!-- Pass Rate -->
-        <div class="rainbow-border shadow-2xl">
-            <div class="rounded-2xl p-6 sm:p-8 text-center" style="background:#12022a">
-                <h2 class="font-display text-2xl sm:text-3xl font-bold tracking-widest uppercase" style="color:#e2e8f0">Pass Rate</h2>
-                <div id="passRate"
-                     class="font-display text-6xl sm:text-8xl md:text-9xl font-extrabold number-flicker py-4"
-                     style="background: linear-gradient(135deg, #fde047, #fb923c, #f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text">0%</div>
-            </div>
-        </div>
-
         <!-- Passes Over Time Chart -->
         <div class="rounded-2xl shadow-2xl p-4 sm:p-6" style="background: rgba(255,255,255,0.04); border: 2px solid rgba(255,255,255,0.1)">
             <h2 class="font-display text-xl sm:text-2xl font-bold tracking-widest uppercase text-center mb-4" style="color:#e2e8f0">Passes Over Time</h2>
@@ -159,7 +149,6 @@
         const passedEl = document.getElementById('passedCount');
         const pendingEl = document.getElementById('pendingCount');
         const attemptedEl = document.getElementById('attemptedCount');
-        const passRateEl = document.getElementById('passRate');
         const revealOverlay = document.getElementById('reveal-overlay');
         const revealButton = document.getElementById('reveal-button');
         const mainContent = document.getElementById('main-content');
@@ -265,7 +254,6 @@
             animateCount(passedEl, passedTotal);
             animateCount(pendingEl, pendingTotal);
             animateCount(attemptedEl, attemptedTotal);
-            animateRate(passRateEl, attemptedTotal > 0 ? (passedTotal / (attemptedTotal - pendingTotal)) * 100 : 0);
             initChart();
         }
 
