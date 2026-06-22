@@ -56,9 +56,9 @@ switch (action) {
     if (!match) panic("no match");
 
     const today = new Date().toISOString().split('T')[0];
-    const currentDates = match[1].trim();
-    const newDates = currentDates + `,\n            "${today}"`;
-    newContent = content.replace(passDateRegex, `const passDates = [${newDates},\n        ];`);
+    const currentDates = match[1];
+    const newDates = currentDates + `    "${today}",`;
+    newContent = content.replace(passDateRegex, `const passDates = [${newDates}\n        ];`);
     if (newContent === content) panic("failed to update passDates");
     content = newContent;
 
