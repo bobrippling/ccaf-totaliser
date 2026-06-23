@@ -145,19 +145,8 @@
 
     <script>
         // --- TO UPDATE THE AMOUNTS, CHANGE THESE VALUES ---
-        const passDates = [
-            "2026-06-06", // r
-            "2026-06-16", // j
-            "2026-06-17", // a
-            "2026-06-18", // g
-            "2026-06-18", // a
-            "2026-06-22", // r
-            "2026-06-22", // e
-            "2026-06-22", // l
-        ];
-        const pendingTotal = 3;   // Number of people awaiting results
-        const failedTotal = 2;
 
+        // Exam wait times - format: [{start_date: Date, end_date: Date|null}, ...]
         const examWaitTimes = [
             {start_date: new Date("2026-05-29"), end_date: new Date("2026-06-06")}, // r
             // unsure of exam submit date:
@@ -172,7 +161,22 @@
             {start_date: new Date("2026-06-09"), end_date: null}, // js
             {start_date: new Date("2026-06-09"), end_date: null}, // ts
         ];
+
+        const pendingTotal = examWaitTimes.filter(x => x.end_date == null).length;
+        const failedTotal = 2;
         // ---------------------------------------------------
+
+        // Infer passDates from examWaitTimes (extract end_date from completed exams)
+        function buildPassDates() {
+            return examWaitTimes
+                .filter(session => session.end_date != null)
+                .map(session => {
+                    const endDate = new Date(session.end_date);
+                    return endDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+                });
+        }
+
+        const passDates = buildPassDates();
 
         const passedTotal = passDates.length;
         const attemptedTotal = passedTotal + failedTotal + pendingTotal;
