@@ -90,7 +90,7 @@
         <div class="rounded-full h-2 w-full" style="background: linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e, #06b6d4, #3b82f6, #8b5cf6)"></div>
 
         <!-- Stats Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- Passed -->
             <div class="card-base card-green">
                 <h3 class="font-display text-xl sm:text-2xl mb-2" style="color:#4ade80">PASSED</h3>
@@ -108,12 +108,25 @@
                 <h3 class="font-display text-xl sm:text-2xl mb-2" style="color:#60a5fa">ATTEMPTED</h3>
                 <div id="attemptedCount" class="text-5xl sm:text-6xl font-bold number-flicker" style="color:#60a5fa">0</div>
             </div>
+
+            <!-- Average Wait Time -->
+            <div class="card-base" style="background: rgba(139, 92, 246, 0.12); border: 2px solid #a78bfa; box-shadow: 0 0 24px rgba(139, 92, 246, 0.25);">
+                <h3 class="font-display text-base sm:text-xl mb-2 whitespace-nowrap" style="color:#c4b5fd">AVG WAIT TIME</h3>
+                <div id="avgWaitTime" class="text-4xl sm:text-5xl font-bold number-flicker" style="color:#c4b5fd">--</div>
+                <p id="waitTimeUnit" class="text-xs sm:text-sm text-gray-300 mt-1">minutes</p>
+            </div>
         </div>
 
         <!-- Passes Over Time Chart -->
         <div class="rounded-2xl shadow-2xl p-4 sm:p-6" style="background: rgba(255,255,255,0.04); border: 2px solid rgba(255,255,255,0.1)">
             <h2 class="font-display text-xl sm:text-2xl font-bold tracking-widest uppercase text-center mb-4" style="color:#e2e8f0">Passes Over Time</h2>
             <canvas id="passChart"></canvas>
+        </div>
+
+        <!-- Wait Time Distribution Chart -->
+        <div class="rounded-2xl shadow-2xl p-4 sm:p-6" style="background: rgba(255,255,255,0.04); border: 2px solid rgba(255,255,255,0.1)">
+            <h2 class="font-display text-xl sm:text-2xl font-bold tracking-widest uppercase text-center mb-4" style="color:#e2e8f0">Wait Time Distribution</h2>
+            <canvas id="waitTimeChart"></canvas>
         </div>
 
         <!-- Rainbow divider strip (bottom) -->
@@ -144,6 +157,21 @@
         ];
         const pendingTotal = 3;   // Number of people awaiting results
         const failedTotal = 2;
+
+        const examWaitTimes = [
+            {start_date: new Date("2026-05-29"), end_date: new Date("2026-06-06")}, // r
+            // unsure of exam submit date:
+            {start_date: new Date("2026-06-09"), end_date: new Date("2026-06-16")}, // jz
+            {start_date: new Date("2026-06-09"), end_date: new Date("2026-06-17")}, // an
+            {start_date: new Date("2026-06-09"), end_date: new Date("2026-06-18")}, // g
+            {start_date: new Date("2026-06-09"), end_date: new Date("2026-06-18")}, // am
+            {start_date: new Date("2026-06-09"), end_date: new Date("2026-06-22")}, // r
+            {start_date: new Date("2026-06-09"), end_date: new Date("2026-06-22")}, // ep
+            {start_date: new Date("2026-06-09"), end_date: new Date("2026-06-22")}, // l
+            {start_date: new Date("2026-06-09"), end_date: null}, // d
+            {start_date: new Date("2026-06-09"), end_date: null}, // js
+            {start_date: new Date("2026-06-09"), end_date: null}, // ts
+        ];
         // ---------------------------------------------------
 
         const passedTotal = passDates.length;
@@ -152,6 +180,8 @@
         const passedEl = document.getElementById('passedCount');
         const pendingEl = document.getElementById('pendingCount');
         const attemptedEl = document.getElementById('attemptedCount');
+        const avgWaitTimeEl = document.getElementById('avgWaitTime');
+        const waitTimeUnitEl = document.getElementById('waitTimeUnit');
         const revealOverlay = document.getElementById('reveal-overlay');
         const revealButton = document.getElementById('reveal-button');
         const mainContent = document.getElementById('main-content');
@@ -186,6 +216,23 @@
                 return { x: d, y: cumulative };
             });
             return points;
+        }
+
+        function buildWaitTimeData() {
+            const waitDayGroups = {};
+
+            for (const session of examWaitTimes) {
+                const startDate = new Date(session.start_date);
+                const endDate = session.end_date ? new Date(session.end_date) : null;
+
+                if (endDate) {
+                    const waitMs = endDate - startDate;
+                    const waitDays = Math.ceil(waitMs / (1000 * 60 * 60 * 24));
+                    waitDayGroups[waitDays] = (waitDayGroups[waitDays] || 0) + 1;
+                }
+            }
+
+            return waitDayGroups;
         }
 
         function initChart() {
@@ -253,11 +300,117 @@
             });
         }
 
+        function initWaitTimeChart() {
+            const waitDayGroups = buildWaitTimeData();
+
+            if (Object.keys(waitDayGroups).length === 0) {
+                const ctx = document.getElementById('waitTimeChart').getContext('2d');
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '16px Poppins';
+                ctx.textAlign = 'center';
+                ctx.fillText('No completed exams yet', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+
+            const days = Object.keys(waitDayGroups).map(Number).sort((a, b) => a - b);
+            const counts = days.map(d => waitDayGroups[d]);
+
+            const ctx = document.getElementById('waitTimeChart').getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+            gradient.addColorStop(0, 'rgba(139, 92, 246, 0.35)');
+            gradient.addColorStop(1, 'rgba(139, 92, 246, 0)');
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: days.map(d => d === 1 ? '1 day' : `${d} days`),
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: gradient,
+                        borderColor: '#a78bfa',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        barThickness: 'flex',
+                        minBarLength: 2,
+                    }]
+                },
+                options: {
+                    indexAxis: 'x',
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#12022a',
+                            borderColor: '#a78bfa',
+                            borderWidth: 1,
+                            titleColor: '#e9d5ff',
+                            bodyColor: '#fff',
+                            callbacks: {
+                                label: item => ` ${item.parsed.y} ${item.parsed.y === 1 ? 'person' : 'people'}`,
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#94a3b8', font: { family: 'Poppins' } },
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#94a3b8',
+                                font: { family: 'Poppins' },
+                                stepSize: 1,
+                                precision: 0,
+                            },
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                        }
+                    }
+                }
+            });
+        }
+
+        function calculateAverageWaitTime() {
+            if (examWaitTimes.length === 0) return null;
+
+            let totalWaitMs = 0;
+            let completedCount = 0;
+
+            for (const session of examWaitTimes) {
+                const startDate = new Date(session.start_date);
+                const endDate = session.end_date ? new Date(session.end_date) : null;
+
+                if (endDate) {
+                    totalWaitMs += (endDate - startDate);
+                    completedCount++;
+                }
+            }
+
+            if (completedCount === 0) return null;
+
+            const avgWaitMs = totalWaitMs / completedCount;
+            const avgWaitMins = Math.round(avgWaitMs / 60000);
+            return avgWaitMins;
+        }
+
+        function updateWaitTimeDisplay() {
+            const avgWait = calculateAverageWaitTime();
+            if (avgWait !== null) {
+                animateCount(avgWaitTimeEl, avgWait);
+                waitTimeUnitEl.textContent = avgWait === 1 ? 'minute' : 'minutes';
+            } else {
+                avgWaitTimeEl.textContent = '--';
+                waitTimeUnitEl.textContent = 'minutes';
+            }
+        }
+
         function updateDisplay() {
             animateCount(passedEl, passedTotal);
             animateCount(pendingEl, pendingTotal);
             animateCount(attemptedEl, attemptedTotal);
+            updateWaitTimeDisplay();
             initChart();
+            initWaitTimeChart();
         }
 
         function playSound() {
