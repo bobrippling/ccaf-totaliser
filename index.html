@@ -113,7 +113,7 @@
             <div class="card-base" style="background: rgba(139, 92, 246, 0.12); border: 2px solid #a78bfa; box-shadow: 0 0 24px rgba(139, 92, 246, 0.25);">
                 <h3 class="font-display text-base sm:text-xl mb-2" style="color:#c4b5fd">AVG WAIT TIME</h3>
                 <div id="avgWaitTime" class="text-4xl sm:text-5xl font-bold number-flicker" style="color:#c4b5fd">--</div>
-                <p id="waitTimeUnit" class="text-xs sm:text-sm text-gray-300 mt-1">minutes</p>
+                <p id="waitTimeUnit" class="text-xs sm:text-sm text-gray-300 mt-1">days</p>
             </div>
         </div>
 
@@ -376,35 +376,35 @@
 
         function calculateAverageWaitTime() {
             if (examWaitTimes.length === 0) return null;
-
+            
             let totalWaitMs = 0;
             let completedCount = 0;
-
+            
             for (const session of examWaitTimes) {
                 const startDate = new Date(session.start_date);
                 const endDate = session.end_date ? new Date(session.end_date) : null;
-
+                
                 if (endDate) {
                     totalWaitMs += (endDate - startDate);
                     completedCount++;
                 }
             }
-
+            
             if (completedCount === 0) return null;
-
+            
             const avgWaitMs = totalWaitMs / completedCount;
-            const avgWaitMins = Math.round(avgWaitMs / 60000);
-            return avgWaitMins;
+            const avgWaitDays = Math.round(avgWaitMs / (1000 * 60 * 60 * 24));
+            return avgWaitDays;
         }
 
         function updateWaitTimeDisplay() {
             const avgWait = calculateAverageWaitTime();
             if (avgWait !== null) {
                 animateCount(avgWaitTimeEl, avgWait);
-                waitTimeUnitEl.textContent = avgWait === 1 ? 'minute' : 'minutes';
+                waitTimeUnitEl.textContent = avgWait === 1 ? 'day' : 'days';
             } else {
                 avgWaitTimeEl.textContent = '--';
-                waitTimeUnitEl.textContent = 'minutes';
+                waitTimeUnitEl.textContent = 'days';
             }
         }
 
