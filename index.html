@@ -33,7 +33,7 @@
             transition: all 0.3s ease-in-out;
             text-shadow: 0 0 8px rgba(255, 255, 255, 0.6), 0 0 20px currentColor;
         }
-        /* Rainbow ring border — mimics the stacked coloured rings */
+        /* Rainbow ring border - mimics the stacked coloured rings */
         .rainbow-border {
             background: linear-gradient(180deg,
                 #ef4444 0%,
@@ -93,25 +93,25 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- Passed -->
             <div class="card-base card-green">
-                <h3 class="font-display text-xl sm:text-2xl mb-2" style="color:#4ade80">PASSED</h3>
+                <h3 class="font-display text-base sm:text-xl mb-2" style="color:#4ade80">PASSED</h3>
                 <div id="passedCount" class="text-5xl sm:text-6xl font-bold text-white number-flicker" style="color:#4ade80">0</div>
             </div>
 
             <!-- Awaiting Results -->
             <div class="card-base card-amber">
-                <h3 class="font-display text-base sm:text-xl mb-2 whitespace-nowrap" style="color:#facc15">AWAITING RESULTS</h3>
+                <h3 class="font-display text-base sm:text-xl mb-2" style="color:#facc15">AWAITING RESULTS</h3>
                 <div id="pendingCount" class="text-5xl sm:text-6xl font-bold number-flicker" style="color:#facc15">0</div>
             </div>
 
             <!-- Attempted -->
             <div class="card-base card-blue">
-                <h3 class="font-display text-xl sm:text-2xl mb-2" style="color:#60a5fa">ATTEMPTED</h3>
+                <h3 class="font-display text-base sm:text-xl mb-2" style="color:#60a5fa">ATTEMPTED</h3>
                 <div id="attemptedCount" class="text-5xl sm:text-6xl font-bold number-flicker" style="color:#60a5fa">0</div>
             </div>
 
             <!-- Average Wait Time -->
             <div class="card-base" style="background: rgba(139, 92, 246, 0.12); border: 2px solid #a78bfa; box-shadow: 0 0 24px rgba(139, 92, 246, 0.25);">
-                <h3 class="font-display text-base sm:text-xl mb-2 whitespace-nowrap" style="color:#c4b5fd">AVG WAIT TIME</h3>
+                <h3 class="font-display text-base sm:text-xl mb-2" style="color:#c4b5fd">AVG WAIT TIME</h3>
                 <div id="avgWaitTime" class="text-4xl sm:text-5xl font-bold number-flicker" style="color:#c4b5fd">--</div>
                 <p id="waitTimeUnit" class="text-xs sm:text-sm text-gray-300 mt-1">minutes</p>
             </div>
